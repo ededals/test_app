@@ -1,0 +1,19 @@
+form{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+input[type='text'] {
+    width: 200px;
+    margin: 5px;
+    
+}
+
+
+select{
+    width: 204px;
+    margin: 5px;
+    
+}
