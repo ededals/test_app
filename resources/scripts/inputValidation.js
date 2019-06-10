@@ -10,7 +10,7 @@ function validateSessionStart(event){
     var username = document.getElementById('username').value;
     var testValue = document.getElementById('test').value;
     if (username.length < 1 || testValue == 0){
-        var message="Lai turpinātu nepieciešams ievadīt vārdu un izvēlēties testu";
+        var message="JS: Lai turpinātu nepieciešams ievadīt vārdu un izvēlēties testu";
         appendError(message, event);//from Utils.js
     } else if (username.length > 255){
         var message = "Pārāk garš lietotājvārds, ievadiet lietotājvārdu, kas īsāks par 255 zīmēm";
