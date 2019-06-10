@@ -1,5 +1,3 @@
-# Turn rewriting on
-Options +FollowSymLinks
 RewriteEngine On
 # Redirect requests to index.php
 RewriteCond %{REQUEST_URI} !=/test3/index.php

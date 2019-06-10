@@ -10,7 +10,7 @@
     <body>
         <h1 id="question">
             <?php
-                echo $this->test_session->get_current_question();
+                echo $this->test_session->get_question_text();
             ?>
         </h1>
         <?php

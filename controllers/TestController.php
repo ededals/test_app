@@ -8,22 +8,28 @@
 
         private $error;
         private $test_session;
-        
+        private $conn;
 
+        public function __construct($conn){
+            $this->conn = $conn;
+        }
         /**
          * Function extracts requested document name from URI
          * and then decides to which helper function to delegate further execution
          */
         public function handleRequest(){
-
             $document_list = explode("/", $_SERVER['REQUEST_URI']);
             $document = array_pop($document_list);
-            if (isset($_REQUEST['answer'])){
-                $this->nextAnswer();
-            } else if ($document == "session.php"){
-                $this->loadQuestions();
-            } else if ($document == "result.php"){
-                $this->showResults();
+            $sid = Test_Session::is_init();
+            if (!is_null($sid)){
+                $this->test_session = Test_Session::from_id($sid, $this->conn);
+                if ($document == "result.php"){
+                    $this->showResults();
+                }else if (isset($_REQUEST['answer'])){
+                    $this->nextAnswer();
+                } else if ($document == "session.php"){
+                    $this->loadQuestions();
+                } 
             } else {
                 $this->startSession();
             }
@@ -46,7 +52,7 @@
                     return;
                 } else {
                     $username=trim(htmlspecialchars($_POST['username']));
-                    $this->test_session = new Test_Session(
+                    $this->test_session = Test_Session::new_session(
                         $_POST['test_selection'],
                         $username
                     );
@@ -55,7 +61,6 @@
                 }
         
             }
-            $conn = new Connection();
             include "views/startSession.php";
         }
 
@@ -70,23 +75,18 @@
          * Function
          */
         private function nextAnswer(){
-            $session_status = $this->test_session->get_status();
-            if ($session_status == false){
-                header('Location: index.php');
-                return;
+
+            $next_question_loaded = $this->test_session->process_user_action($_REQUEST["answer"]);
+            if ($next_question_loaded){
+                $response = new stdClass;
+                $response->question = $this->test_session->get_question_text();
+                $response->answers = $this->test_session->get_answers();
+                $response->progress = $this->test_session->get_session_progress();
+                $encoded = json_encode($response);
+                echo $encoded;
             } else {
-                $next_question_loaded = $this->test_session->process_user_action($_REQUEST["answer"]);
-                if ($next_question_loaded){
-                    $response = new stdClass;
-                    $response->question = $this->test_session->get_current_question();
-                    $response->answers = $this->test_session->get_answers();
-                    $response->progress = $this->test_session->get_session_progress();
-                    $encoded = json_encode($response);
-                    echo $encoded;
-                } else {
-                    header('Location: result.php');
-                    return;
-                }
+                header('Location: result.php');
+                return;
             }
         }
         /**
@@ -95,6 +95,7 @@
         private function showResults(){
             $user=$this->test_session->get_username();
             $message=$this->test_session->get_result_message();
+            $this->test_session->clear_session();
             include "views/result.php";
         }
 

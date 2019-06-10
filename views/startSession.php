@@ -18,7 +18,7 @@
             <select class="inp" id="test" name="test_selection">
                 <option value="0">Izvēlies testu</option>
                 <?php  
-                    $test_list = $conn->get("SELECT * FROM test");
+                    $test_list = Test_Session::get_tests($this->conn);
                     foreach ($test_list as $test){
                         echo '<option value="'.$test['test_id'].'">';
                         echo $test['test_title'];
